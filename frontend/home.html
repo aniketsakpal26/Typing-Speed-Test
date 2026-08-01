@@ -1,0 +1,1543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Typing Speed App</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .home-body {
+            margin: 0;
+            padding: 0;
+            background: #f6f9fc;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .nav-drawer {
+            position: fixed;
+            left: -300px;
+            top: 0;
+            width: 300px;
+            height: 100%;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            padding: 20px;
+            z-index: 1000;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        
+        .nav-drawer.open {
+            left: 0;
+        }
+
+        .nav-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .nav-header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .user-info:hover {
+            background: #e9ecef;
+        }
+
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1001;
+            background: #4a90e2;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .typing-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px 20px;
+            box-sizing: border-box;
+        }
+
+        .text-display {
+            font-size: 1.3em;
+            margin: 20px 0;
+            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            text-align: left;
+            line-height: 1.8;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            word-wrap: break-word;
+            box-sizing: border-box;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 1.2em;
+            border: 2px solid #4a90e2;
+            border-radius: 12px;
+            resize: none;
+            font-family: inherit;
+            box-sizing: border-box;
+            background: white;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: white;
+            color: #4a90e2;
+            padding: 15px 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .stat-box .label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .value {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .results-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .mistake-list {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .mistake-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+        }
+
+        .mistake-item .wrong {
+            color: #dc3545;
+            margin-right: 10px;
+        }
+
+        .mistake-item .correct {
+            color: #28a745;
+            margin-left: 10px;
+        }
+
+        .correct {
+            color: #28a745;
+        }
+
+        .incorrect {
+            color: #dc3545;
+            text-decoration: underline;
+            background: #ffebee;
+            border-radius: 2px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .profile-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            z-index: 1001;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .profile-modal.active {
+            display: block;
+        }
+
+        .profile-modal h2 {
+            margin-top: 0;
+            color: #4a90e2;
+        }
+
+        .profile-stats {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .profile-stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .multiplayer-options {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .room-details {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .room-details h4 {
+            margin: 0;
+            color: #4a90e2;
+        }
+
+        .room-details p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+
+        .player-list {
+            margin-top: 10px;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .player-item .player-name {
+            flex-grow: 1;
+        }
+
+        .player-item .player-status {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            background: #e9ecef;
+        }
+
+        .player-item .player-ready {
+            background: #28a745;
+            color: white;
+        }
+
+        .player-item .player-host {
+            background: #4a90e2;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .typing-container {
+                padding: 70px 15px 15px;
+            }
+
+            .text-display {
+                font-size: 1.1em;
+                padding: 15px;
+            }
+
+            .input-field {
+                padding: 15px;
+                font-size: 1.1em;
+            }
+
+            .profile-modal {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+
+        .leaderboard-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            z-index: 1001;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .leaderboard-modal.active {
+            display: block;
+        }
+
+        .leaderboard-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            border: none;
+            background: #f1f3f5;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .leaderboard-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-content th,
+        .leaderboard-content td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .leaderboard-content th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .leaderboard-content tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .leaderboard-content tr:hover {
+            background: #e9ecef;
+        }
+
+        .rank-1 {
+            color: #ffd700; /* Gold */
+            font-weight: bold;
+        }
+
+        .rank-2 {
+            color: #c0c0c0; /* Silver */
+            font-weight: bold;
+        }
+
+        .rank-3 {
+            color: #cd7f32; /* Bronze */
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="home-body">
+    <div class="overlay" id="overlay" onclick="toggleNav()"></div>
+    <button class="menu-btn" onclick="toggleNav()">
+        ☰ Menu
+    </button>
+    
+    <div class="nav-drawer" id="navDrawer">
+        <div class="nav-header">
+            <img src="https://img.icons8.com/ios-filled/50/4a90e2/box.png" alt="Logo"/>
+            <h2>Typetest</h2>
+        </div>
+
+        <div class="user-info" onclick="showProfile()">
+            <h3 id="username">Welcome!</h3>
+            <p id="userStats">Tests completed: 0</p>
+            <small style="color: #666;">Click to view profile</small>
+        </div>
+
+        <div class="settings-section">
+            <h3>Settings</h3>
+            <label>Time Limit (seconds):</label>
+            <select id="timeLimit" onchange="updateTimeLimit()" class="input-field">
+                <option value="30">30 seconds</option>
+                <option value="60" selected>1 minute</option>
+                <option value="120">2 minutes</option>
+                <option value="300">5 minutes</option>
+            </select>
+        </div>
+
+        <div class="settings-section">
+            <h3>Multiplayer</h3>
+            <div class="multiplayer-options">
+                <button onclick="createRoom()" class="primary-btn">Create Room</button>
+                <div style="margin: 10px 0;">OR</div>
+                <div class="form-group">
+                    <input type="text" id="roomCode" placeholder="Enter Room Code" class="input-field" style="margin: 0;">
+                    <button onclick="joinRoom()" class="primary-btn" style="margin-top: 10px;">Join Room</button>
+                </div>
+            </div>
+            <div id="roomInfo" style="display: none; margin-top: 15px;">
+                <div class="room-details">
+                    <h4>Room: <span id="roomCodeDisplay"></span></h4>
+                    <p>Players: <span id="playerCount">1</span>/4</p>
+                </div>
+                <div id="playerList" class="player-list"></div>
+                <button onclick="startGame()" id="startGameBtn" class="primary-btn" style="margin-top: 10px;" disabled>Start Game</button>
+                <button onclick="leaveRoom()" class="primary-btn" style="margin-top: 10px; background: #dc3545;">Leave Room</button>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>Games</h3>
+            <button onclick="window.location.href='games.html'" class="primary-btn">🎮 Play Games</button>
+        </div>
+
+        <div class="settings-section">
+            <h3>Leaderboard</h3>
+            <button onclick="showLeaderboard()" class="primary-btn">View Leaderboard</button>
+        </div>
+
+        <div class="settings-section">
+            <h3>Account</h3>
+            <button onclick="logout()" class="primary-btn">Logout</button>
+        </div>
+    </div>
+
+    <div class="profile-modal" id="profileModal">
+        <button class="close-modal" onclick="hideProfile()">×</button>
+        <h2>Profile</h2>
+        <div class="profile-stats">
+            <div class="profile-stat-item">
+                <span>Username</span>
+                <span id="profileUsername">-</span>
+            </div>
+            <div class="profile-stat-item">
+                <span>Email</span>
+                <span id="profileEmail">-</span>
+            </div>
+            <div class="profile-stat-item">
+                <span>Highest WPM</span>
+                <span id="profileHighestWpm">0</span>
+            </div>
+            <div class="profile-stat-item">
+                <span>Average WPM</span>
+                <span id="profileAvgWpm">0</span>
+            </div>
+            <div class="profile-stat-item">
+                <span>Tests Completed</span>
+                <span id="profileTestsCompleted">0</span>
+            </div>
+            <div class="profile-stat-item">
+                <span>Best Accuracy</span>
+                <span id="profileBestAccuracy">0%</span>
+            </div>
+            <div class="profile-stat-item">
+                <span>Total Time Typed</span>
+                <span id="profileTotalTime">0 min</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="leaderboard-modal" id="leaderboardModal">
+        <button class="close-modal" onclick="hideLeaderboard()">×</button>
+        <h2>Leaderboard</h2>
+        
+        <div class="leaderboard-tabs">
+            <button class="tab-btn active" onclick="switchLeaderboardTab('wpm')">By WPM</button>
+            <button class="tab-btn" onclick="switchLeaderboardTab('accuracy')">By Accuracy</button>
+        </div>
+
+        <div class="leaderboard-content" id="wpmLeaderboard">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Highest WPM</th>
+                        <th>Best Accuracy</th>
+                        <th>Tests</th>
+                    </tr>
+                </thead>
+                <tbody id="wpmLeaderboardBody">
+                    <!-- Will be filled dynamically -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="leaderboard-content" id="accuracyLeaderboard" style="display: none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Best Accuracy</th>
+                        <th>Highest WPM</th>
+                        <th>Tests</th>
+                    </tr>
+                </thead>
+                <tbody id="accuracyLeaderboardBody">
+                    <!-- Will be filled dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="typing-container">
+        <div class="stats">
+            <div class="stat-box">
+                <div class="label">WPM</div>
+                <div class="value" id="wpm">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">Time Left</div>
+                <div class="value" id="time">60s</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">Accuracy</div>
+                <div class="value" id="accuracy">100%</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">Mistakes</div>
+                <div class="value" id="mistakes">0</div>
+            </div>
+        </div>
+
+        <div class="text-display" id="textDisplay"></div>
+        <textarea 
+            class="input-field" 
+            id="textInput" 
+            placeholder="Click 'Start Test' to begin typing..."
+            disabled
+        ></textarea>
+        <button id="startBtn" class="primary-btn" onclick="startTest()">Start Test</button>
+        
+        <div class="results-container" id="resultsContainer">
+            <h2>Test Results</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="label">Final WPM</div>
+                    <div class="value" id="finalWpm">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Accuracy</div>
+                    <div class="value" id="finalAccuracy">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Total Mistakes</div>
+                    <div class="value" id="finalMistakes">0</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="wpmChart"></canvas>
+            </div>
+
+            <div class="mistake-list" id="mistakeList">
+                <h3>Mistakes Made</h3>
+                <!-- Mistakes will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auth helpers: prefer sessionStorage (per-tab) to avoid cross-tab overwrite during multi-user testing
+        function getToken() {
+            return sessionStorage.getItem('token') || localStorage.getItem('token');
+        }
+        function getUsername() {
+            return sessionStorage.getItem('username') || localStorage.getItem('username');
+        }
+        function setAuth(token, username) {
+            try {
+                sessionStorage.setItem('token', token);
+                sessionStorage.setItem('username', username);
+            } catch (e) {
+                // Fallback to localStorage if sessionStorage is unavailable
+                localStorage.setItem('token', token);
+                localStorage.setItem('username', username);
+            }
+        }
+        // Check authentication
+        if (!getToken()) {
+            window.location.href = 'index.html';
+        }
+
+        // Set username
+        document.getElementById('username').textContent = 
+            `Welcome, ${getUsername() || 'User'}!`;
+
+        const texts = [
+            "The quick brown fox jumps over the lazy dog while the sun sets in the horizon creating a beautiful scene. Nature has always been a source of inspiration for writers and artists throughout history. The golden rays of sunlight filtering through the trees create magical moments that capture our imagination and fill our hearts with wonder. Every season brings its own unique beauty and charm that reminds us of the endless cycle of life and renewal.",
+            "Programming is the art of telling another human what one wants the computer to do in a way that is both precise and readable. Modern software development requires not only technical skills but also creativity, problem-solving abilities, and effective communication. Developers must understand complex algorithms, design patterns, and user experience principles to create applications that are both functional and intuitive. The field of computer science continues to evolve rapidly with new technologies, frameworks, and methodologies emerging constantly.",
+            "Success is not final, failure is not fatal: it is the courage to continue that counts in the face of adversity. Throughout history, the greatest achievements have come from individuals who persevered through challenges and setbacks. They understood that every obstacle is an opportunity to learn, grow, and become stronger. The journey toward success is rarely linear, and it requires patience, determination, and the willingness to adapt when circumstances change. True success is measured not by the absence of failure, but by the ability to rise above it.",
+            "Life is like riding a bicycle. To keep your balance, you must keep moving forward through all challenges and obstacles that come your way. The metaphor of cycling represents the continuous motion required to maintain stability and progress in our personal and professional lives. Just as a cyclist must navigate different terrains, weather conditions, and traffic situations, we must learn to adapt to various circumstances while maintaining our focus on the destination ahead. The key is to maintain momentum even when the path becomes difficult or uncertain.",
+            "In three words I can sum up everything I have learned about life: it goes on, regardless of circumstances, challenges, or temporary setbacks that may occur along the way. This simple yet profound truth reminds us that time continues to move forward, seasons change, and new opportunities arise even after the most difficult periods. The resilience of the human spirit is remarkable, and our ability to heal, adapt, and find meaning in both joy and sorrow is what makes us uniquely human. Every experience, whether positive or negative, contributes to our growth and understanding of the world around us."
+        ];
+
+        let currentText = '';
+        let timeLeft = 60;
+        let timer = null;
+        let wpmHistory = [];
+        let startTime;
+        let isTestActive = false;
+        let chart;
+        let mistakes = [];
+        let totalMistakes = 0;
+
+        function toggleNav() {
+            document.getElementById('navDrawer').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function showProfile() {
+            loadUserProfile();
+            document.getElementById('profileModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function hideProfile() {
+            document.getElementById('profileModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('http://localhost:5000/api/typing/stats', {
+                    headers: {
+                        'x-auth-token': getToken()
+                    }
+                });
+                const userResponse = await fetch('http://localhost:5000/api/auth/user', {
+                    headers: {
+                        'x-auth-token': getToken()
+                    }
+                });
+
+                const stats = await response.json();
+                const userData = await userResponse.json();
+
+                document.getElementById('profileUsername').textContent = userData.username;
+                document.getElementById('profileEmail').textContent = userData.email;
+                document.getElementById('profileHighestWpm').textContent = stats.highestWPM;
+                document.getElementById('profileAvgWpm').textContent = Math.round(stats.averageWPM);
+                document.getElementById('profileTestsCompleted').textContent = stats.testsCompleted;
+                document.getElementById('profileBestAccuracy').textContent = stats.bestAccuracy + '%';
+                document.getElementById('profileTotalTime').textContent = 
+                    Math.round(stats.totalTimePlayed / 60) + ' min';
+            } catch (err) {
+                console.error('Error loading profile:', err);
+            }
+        }
+
+        function updateTimeLimit() {
+            timeLeft = parseInt(document.getElementById('timeLimit').value);
+            document.getElementById('time').textContent = timeLeft + 's';
+        }
+
+        function getRandomText() {
+            return texts[Math.floor(Math.random() * texts.length)];
+        }
+
+        function calculateWPM(inputLength, timeElapsed) {
+            const words = inputLength / 5;
+            const minutes = timeElapsed / 60;
+            return Math.round(words / minutes);
+        }
+
+        function updateChart() {
+            if (chart) {
+                chart.destroy();
+            }
+
+            const ctx = document.getElementById('wpmChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: wpmHistory.map((_, i) => i + 1),
+                    datasets: [{
+                        label: 'WPM over time',
+                        data: wpmHistory,
+                        borderColor: '#4a90e2',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Words Per Minute'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time (seconds)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Utility to clear previous multiplayer "Player Results"
+        function clearPlayerResults() {
+            const resultsContainer = document.getElementById('resultsContainer');
+            const existing = resultsContainer.querySelector('.player-results');
+            if (existing) existing.remove();
+        }
+
+        async function startTest() {
+            if (isTestActive) return;
+            
+            // Check if in multiplayer mode
+            if (currentRoom) {
+                alert('You are in a multiplayer room. Use the "Start Game" button in the room to start a multiplayer game.');
+                return;
+            }
+            
+            // Reset everything
+            isTestActive = true;
+            currentText = getRandomText();
+            document.getElementById('textDisplay').textContent = currentText;
+            document.getElementById('textInput').value = '';
+            document.getElementById('textInput').disabled = false;
+            document.getElementById('textInput').focus();
+            document.getElementById('resultsContainer').style.display = 'none';
+            clearPlayerResults();
+            document.getElementById('mistakes').textContent = '0';
+            totalMistakes = 0;
+            mistakes = [];
+            wpmHistory = [];
+            // Hide mistakes panel for cleaner single-player results
+            const mistakeListEl = document.getElementById('mistakeList');
+            if (mistakeListEl) mistakeListEl.style.display = 'none';
+            
+            timeLeft = parseInt(document.getElementById('timeLimit').value);
+            document.getElementById('time').textContent = timeLeft + 's';
+            startTime = new Date();
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time').textContent = timeLeft + 's';
+                
+                const timeElapsed = (new Date() - startTime) / 1000;
+                const currentInput = document.getElementById('textInput').value;
+                const currentWPM = calculateWPM(currentInput.length, timeElapsed);
+                document.getElementById('wpm').textContent = currentWPM;
+                wpmHistory.push(currentWPM);
+                
+                if (timeLeft <= 0) {
+                    endTest();
+                }
+            }, 1000);
+        }
+
+        async function endTest() {
+            clearInterval(timer);
+            isTestActive = false;
+            document.getElementById('textInput').disabled = true;
+            
+            // Show results
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('finalWpm').textContent = document.getElementById('wpm').textContent;
+            document.getElementById('finalAccuracy').textContent = document.getElementById('accuracy').textContent;
+            document.getElementById('finalMistakes').textContent = totalMistakes;
+            
+            // Show chart
+            document.querySelector('.chart-container').style.display = 'block';
+            updateChart();
+            
+            // Hide detailed mistakes list (we keep only the counter stat)
+            const mistakeList = document.getElementById('mistakeList');
+            if (mistakeList) {
+                mistakeList.style.display = 'none';
+                mistakeList.innerHTML = '<h3>Mistakes Made</h3>';
+            }
+
+            // Save results to backend
+            try {
+                const response = await fetch('http://localhost:5000/api/typing/score', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-auth-token': getToken()
+                    },
+                    body: JSON.stringify({
+                        wpm: parseInt(document.getElementById('wpm').textContent),
+                        accuracy: parseInt(document.getElementById('accuracy').textContent),
+                        duration: parseInt(document.getElementById('timeLimit').value),
+                        text: currentText,
+                        wpmHistory: wpmHistory
+                    })
+                });
+
+                const data = await response.json();
+                if (data.stats) {
+                    document.getElementById('userStats').textContent = 
+                        `Tests completed: ${data.stats.testsCompleted}`;
+                }
+            } catch (err) {
+                console.error('Error saving results:', err);
+            }
+        }
+
+        let socket = null;
+        let currentRoom = null;
+        let isHost = false;
+
+        function initializeWebSocket() {
+            if (socket && socket.readyState === WebSocket.OPEN) return;
+            
+            try {
+                socket = new WebSocket('ws://localhost:5000');
+                
+                socket.onopen = () => {
+                    console.log('Connected to server');
+                };
+                
+                socket.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleWebSocketMessage(data);
+                    } catch (err) {
+                        console.error('Error parsing WebSocket message:', err);
+                    }
+                };
+                
+                socket.onclose = () => {
+                    console.log('Disconnected from server');
+                    socket = null;
+                    // Try to reconnect after 3 seconds
+                    setTimeout(() => {
+                        if (!socket || socket.readyState === WebSocket.CLOSED) {
+                            initializeWebSocket();
+                        }
+                    }, 3000);
+                };
+
+                socket.onerror = (error) => {
+                    console.error('WebSocket error:', error);
+                    socket = null;
+                };
+            } catch (err) {
+                console.error('Failed to create WebSocket connection:', err);
+                socket = null;
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            console.log('Received message:', data);
+            switch(data.type) {
+                case 'roomCreated':
+                    showRoomInfo(data.roomCode);
+                    isHost = true;
+                    document.getElementById('startGameBtn').style.display = 'block';
+                    break;
+                    
+                case 'roomJoined':
+                    showRoomInfo(data.roomCode);
+                    updatePlayerList(data.players);
+                    isHost = data.isHost;
+                    if (isHost) {
+                        document.getElementById('startGameBtn').style.display = 'block';
+                    }
+                    break;
+                    
+                case 'playerJoined':
+                case 'playerLeft':
+                case 'playerReady':
+                    updatePlayerList(data.players);
+                    break;
+                    
+                case 'gameStarting':
+                    startMultiplayerGame(data);
+                    break;
+                    
+                case 'gameEnded':
+                    handleGameEnded(data);
+                    break;
+                    
+                case 'gameUpdate':
+                    updateGameProgress(data);
+                    break;
+
+                case 'playerFinished':
+                    handlePlayerFinished(data);
+                    break;
+                    
+                case 'error':
+                    alert(data.message);
+                    break;
+            }
+        }
+
+        function createRoom() {
+            initializeWebSocket();
+            
+            // Wait for connection to be established
+            const waitForConnection = () => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'createRoom',
+                        username: getUsername()
+                    }));
+                } else if (socket && socket.readyState === WebSocket.CONNECTING) {
+                    setTimeout(waitForConnection, 100);
+                } else {
+                    alert('Failed to connect to server. Please try again.');
+                }
+            };
+            
+            waitForConnection();
+        }
+
+        function joinRoom() {
+            const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
+            if (!roomCode) {
+                alert('Please enter a room code');
+                return;
+            }
+            
+            initializeWebSocket();
+            
+            // Wait for connection to be established
+            const waitForConnection = () => {
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'joinRoom',
+                        roomCode: roomCode,
+                        username: getUsername()
+                    }));
+                } else if (socket && socket.readyState === WebSocket.CONNECTING) {
+                    setTimeout(waitForConnection, 100);
+                } else {
+                    alert('Failed to connect to server. Please try again.');
+                }
+            };
+            
+            waitForConnection();
+        }
+
+        function showRoomInfo(roomCode) {
+            currentRoom = roomCode;
+            document.getElementById('roomInfo').style.display = 'block';
+            document.getElementById('roomCodeDisplay').textContent = roomCode;
+            document.querySelector('.multiplayer-options').style.display = 'none';
+        }
+
+        function updatePlayerList(players) {
+            const playerList = document.getElementById('playerList');
+            playerList.innerHTML = '';
+            document.getElementById('playerCount').textContent = `${players.length}/4`;
+            
+            players.forEach(player => {
+                const playerItem = document.createElement('div');
+                playerItem.className = 'player-item';
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'player-name';
+                nameSpan.textContent = player.username;
+                
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'player-status';
+                if (player.isHost) {
+                    statusSpan.textContent = 'Host';
+                    statusSpan.classList.add('player-host');
+                } else if (player.ready) {
+                    statusSpan.textContent = 'Ready';
+                    statusSpan.classList.add('player-ready');
+                } else {
+                    statusSpan.textContent = 'Not Ready';
+                }
+                
+                // Add ready button for non-host players (current user)
+                if (!player.isHost && player.username === (getUsername() || '')) {
+                    const readyBtn = document.createElement('button');
+                    readyBtn.className = 'ready-btn' + (player.ready ? ' ready' : '');
+                    readyBtn.textContent = player.ready ? 'Ready!' : 'Ready?';
+                    readyBtn.onclick = toggleReady;
+                    readyBtn.style.marginLeft = '10px';
+                    playerItem.appendChild(readyBtn);
+                }
+                
+                playerItem.appendChild(nameSpan);
+                playerItem.appendChild(statusSpan);
+                playerList.appendChild(playerItem);
+            });
+            
+            // Enable start button for host if enough players are ready
+            if (isHost) {
+                const readyPlayers = players.filter(p => p.ready || p.isHost).length;
+                const startBtn = document.getElementById('startGameBtn');
+                startBtn.disabled = readyPlayers < 2;
+                if (readyPlayers < 2) {
+                    startBtn.title = 'Need at least 2 players ready to start';
+                } else {
+                    startBtn.title = 'Start the game';
+                }
+            }
+        }
+
+        function toggleReady() {
+            if (!currentRoom || !socket) return;
+            
+            socket.send(JSON.stringify({
+                type: 'toggleReady',
+                roomCode: currentRoom
+            }));
+        }
+
+        function startGame() {
+            if (!currentRoom || !isHost || !socket) return;
+            
+            socket.send(JSON.stringify({
+                type: 'startGame',
+                roomCode: currentRoom
+            }));
+        }
+
+        function leaveRoom() {
+            if (!currentRoom || !socket) return;
+            
+            socket.send(JSON.stringify({
+                type: 'leaveRoom',
+                roomCode: currentRoom
+            }));
+            
+            currentRoom = null;
+            isHost = false;
+            document.getElementById('roomInfo').style.display = 'none';
+            document.querySelector('.multiplayer-options').style.display = 'block';
+            document.getElementById('startGameBtn').style.display = 'none';
+        }
+
+        function startMultiplayerGame(gameData) {
+            // Hide room info but keep it in the DOM
+            document.getElementById('roomInfo').style.visibility = 'hidden';
+            
+            // Set up the game with the provided text
+            currentText = gameData.text;
+            document.getElementById('textDisplay').textContent = currentText;
+            document.getElementById('textInput').value = '';
+            document.getElementById('textInput').disabled = false;
+            document.getElementById('textInput').focus();
+            document.getElementById('resultsContainer').style.display = 'none';
+            clearPlayerResults();
+            
+            // Reset stats and variables
+            document.getElementById('wpm').textContent = '0';
+            document.getElementById('accuracy').textContent = '100%';
+            document.getElementById('mistakes').textContent = '0';
+            totalMistakes = 0;
+            mistakes = [];
+            wpmHistory = [];
+            const mistakeListEl2 = document.getElementById('mistakeList');
+            if (mistakeListEl2) mistakeListEl2.style.display = 'none';
+            
+            // Start the timer
+            timeLeft = parseInt(document.getElementById('timeLimit').value);
+            document.getElementById('time').textContent = timeLeft + 's';
+            startTime = new Date();
+            isTestActive = true;
+            
+            timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('time').textContent = timeLeft + 's';
+                
+                // Calculate current WPM
+                const timeElapsed = (new Date() - startTime) / 1000;
+                const currentInput = document.getElementById('textInput').value;
+                const currentWPM = calculateWPM(currentInput.length, timeElapsed);
+                document.getElementById('wpm').textContent = currentWPM;
+                wpmHistory.push(currentWPM);
+                
+                // Send progress update to server
+                if (socket && currentRoom) {
+                    const progress = Math.min((currentInput.length / currentText.length) * 100, 100);
+                    socket.send(JSON.stringify({
+                        type: 'progress',
+                        roomCode: currentRoom,
+                        wpm: currentWPM,
+                        progress: progress
+                    }));
+                }
+                
+                if (timeLeft <= 0) {
+                    endMultiplayerGame();
+                }
+            }, 1000);
+        }
+
+        function endMultiplayerGame() {
+            clearInterval(timer);
+            isTestActive = false;
+            document.getElementById('textInput').disabled = true;
+            
+            if (socket && currentRoom) {
+                socket.send(JSON.stringify({
+                    type: 'gameEnd',
+                    roomCode: currentRoom,
+                    wpm: parseInt(document.getElementById('wpm').textContent),
+                    accuracy: parseInt(document.getElementById('accuracy').textContent)
+                }));
+            }
+            
+            // Show results
+            document.getElementById('resultsContainer').style.display = 'block';
+            document.getElementById('finalWpm').textContent = document.getElementById('wpm').textContent;
+            document.getElementById('finalAccuracy').textContent = document.getElementById('accuracy').textContent;
+            document.getElementById('finalMistakes').textContent = document.getElementById('mistakes').textContent;
+            
+            // Show multiplayer options again
+            document.getElementById('roomInfo').style.visibility = 'visible';
+        }
+
+        function handlePlayerFinished(data) {
+            console.log('Player finished:', data);
+            // Create or update player result in the results container
+            const resultsContainer = document.getElementById('resultsContainer');
+            let playerResults = resultsContainer.querySelector('.player-results');
+            
+            if (!playerResults) {
+                playerResults = document.createElement('div');
+                playerResults.className = 'player-results';
+                playerResults.innerHTML = '<h3>Multiplayer Results</h3>';
+                resultsContainer.appendChild(playerResults);
+            }
+            
+            // Check if player result already exists to avoid duplicates
+            const existingResult = playerResults.querySelector(`[data-username="${data.username}"]`);
+            if (existingResult) {
+                existingResult.innerHTML = `
+                    <span class="player-name">${data.username}</span>
+                    <span class="player-wpm">WPM: ${data.wpm}</span>
+                    <span class="player-accuracy">Accuracy: ${data.accuracy}%</span>
+                `;
+                return;
+            }
+            
+            const playerResult = document.createElement('div');
+            playerResult.className = 'player-result-item';
+            playerResult.setAttribute('data-username', data.username);
+            playerResult.innerHTML = `
+                <span class="player-name">${data.username}</span>
+                <span class="player-wpm">WPM: ${data.wpm}</span>
+                <span class="player-accuracy">Accuracy: ${data.accuracy}%</span>
+            `;
+            playerResults.appendChild(playerResult);
+        }
+
+        function updateGameProgress(data) {
+            // Update the progress display for the specific player
+            const playerList = document.getElementById('playerList');
+            const playerItem = Array.from(playerList.children).find(item => 
+                item.querySelector('.player-name').textContent === data.username
+            );
+            
+            if (playerItem) {
+                let progressBar = playerItem.querySelector('.progress-bar');
+                if (!progressBar) {
+                    progressBar = document.createElement('div');
+                    progressBar.className = 'progress-bar';
+                    progressBar.innerHTML = '<div class="progress"></div>';
+                    playerItem.appendChild(progressBar);
+                }
+                
+                const progress = progressBar.querySelector('.progress');
+                progress.style.width = `${data.progress}%`;
+                
+                let wpmDisplay = playerItem.querySelector('.wpm-display');
+                if (!wpmDisplay) {
+                    wpmDisplay = document.createElement('span');
+                    wpmDisplay.className = 'wpm-display';
+                    playerItem.appendChild(wpmDisplay);
+                }
+                wpmDisplay.textContent = `${data.wpm} WPM`;
+            }
+        }
+
+        function handleGameEnded(data) {
+            console.log('Game ended:', data);
+            // Reset game state
+            isTestActive = false;
+            clearInterval(timer);
+            
+            // Show final results for all players
+            if (data.finalResults && data.finalResults.length > 0) {
+                const resultsContainer = document.getElementById('resultsContainer');
+                let playerResults = resultsContainer.querySelector('.player-results');
+                
+                if (!playerResults) {
+                    playerResults = document.createElement('div');
+                    playerResults.className = 'player-results';
+                    playerResults.innerHTML = '<h3>Final Multiplayer Results</h3>';
+                    resultsContainer.appendChild(playerResults);
+                }
+                
+                // Clear existing results and show final ones
+                const existingItems = playerResults.querySelectorAll('.player-result-item');
+                existingItems.forEach(item => item.remove());
+                
+                // Sort players by WPM (highest first)
+                data.finalResults.sort((a, b) => b.wpm - a.wpm);
+                
+                data.finalResults.forEach((player, index) => {
+                    const playerResult = document.createElement('div');
+                    playerResult.className = 'player-result-item';
+                    const rank = index + 1;
+                    const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`;
+                    playerResult.innerHTML = `
+                        <span class="player-rank">${medal}</span>
+                        <span class="player-name">${player.username}</span>
+                        <span class="player-wpm">WPM: ${player.wpm}</span>
+                        <span class="player-accuracy">Accuracy: ${player.accuracy}%</span>
+                    `;
+                    playerResults.appendChild(playerResult);
+                });
+                
+                // Show results container
+                document.getElementById('resultsContainer').style.display = 'block';
+            }
+            
+            // Update player list to show new ready states
+            updatePlayerList(data.players);
+            
+            // Show room info again
+            document.getElementById('roomInfo').style.visibility = 'visible';
+            
+            // Show a message that the game has ended
+            setTimeout(() => {
+                alert('Game ended! Check the results below.');
+            }, 500);
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('username');
+            window.location.href = 'index.html';
+        }
+
+        document.getElementById('textInput').addEventListener('input', (e) => {
+            if (!isTestActive) return;
+            
+            const inputText = e.target.value;
+            const displayElement = document.getElementById('textDisplay');
+            displayElement.innerHTML = '';
+            
+            let mistakeCount = 0;
+            
+            for (let i = 0; i < currentText.length; i++) {
+                const span = document.createElement('span');
+                span.textContent = currentText[i];
+                
+                if (i < inputText.length) {
+                    if (inputText[i] === currentText[i]) {
+                        span.className = 'correct';
+                    } else {
+                        span.className = 'incorrect';
+                        mistakeCount++;
+                        
+                        // Record mistake if it's a new character
+                        if (i === inputText.length - 1) {
+                            mistakes.push({
+                                typed: inputText[i],
+                                actual: currentText[i],
+                                position: i + 1
+                            });
+                            totalMistakes++;
+                            document.getElementById('mistakes').textContent = totalMistakes;
+                        }
+                    }
+                }
+                
+                displayElement.appendChild(span);
+            }
+            
+            const accuracy = Math.round(((inputText.length - mistakeCount) / inputText.length) * 100) || 100;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+            
+            // Check if completed the text in multiplayer mode
+            if (inputText === currentText && currentRoom) {
+                endMultiplayerGame();
+            } else if (inputText === currentText && !currentRoom) {
+                // Single player mode - get new text
+                currentText = getRandomText();
+                e.target.value = '';
+                displayElement.textContent = currentText;
+            }
+        });
+
+        // Load user stats on page load
+        async function loadUserStats() {
+            try {
+                const response = await fetch('http://localhost:5000/api/typing/stats', {
+                    headers: {
+                        'x-auth-token': localStorage.getItem('token')
+                    }
+                });
+                const stats = await response.json();
+                document.getElementById('userStats').textContent = 
+                    `Tests completed: ${stats.testsCompleted}`;
+            } catch (err) {
+                console.error('Error loading stats:', err);
+            }
+        }
+
+        loadUserStats();
+
+        // Close modals when clicking outside
+        document.getElementById('overlay').addEventListener('click', () => {
+            hideProfile();
+            if (document.getElementById('navDrawer').classList.contains('open')) {
+                toggleNav();
+            }
+        });
+
+        // Add these styles to the existing styles section
+        const styles = `
+            .ready-btn {
+                padding: 5px 10px;
+                border-radius: 4px;
+                border: 1px solid #4a90e2;
+                background: white;
+                color: #4a90e2;
+                cursor: pointer;
+                margin-left: 10px;
+            }
+            
+            .ready-btn.ready {
+                background: #28a745;
+                color: white;
+                border-color: #28a745;
+            }
+            
+            .progress-bar {
+                width: 100%;
+                height: 4px;
+                background: #eee;
+                border-radius: 2px;
+                margin-top: 5px;
+            }
+            
+            .progress {
+                height: 100%;
+                background: #4a90e2;
+                border-radius: 2px;
+                width: 0;
+                transition: width 0.3s ease;
+            }
+            
+            .wpm-display {
+                font-size: 12px;
+                color: #666;
+                margin-left: 10px;
+            }
+            
+            .player-results {
+                margin-top: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 8px;
+            }
+            
+            .player-result-item {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                padding: 12px;
+                background: white;
+                border-radius: 6px;
+                margin: 8px 0;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            }
+            
+            .player-rank {
+                font-size: 18px;
+                font-weight: bold;
+                min-width: 40px;
+                text-align: center;
+            }
+            
+            .player-name {
+                flex-grow: 1;
+                font-weight: 600;
+                color: #333;
+            }
+            
+            .player-wpm {
+                font-weight: bold;
+                color: #4a90e2;
+            }
+            
+            .player-accuracy {
+                font-weight: bold;
+                color: #28a745;
+            }
+        `;
+
+        // Add styles to the document
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = styles;
+        document.head.appendChild(styleSheet);
+
+        function showLeaderboard() {
+            loadLeaderboard();
+            document.getElementById('leaderboardModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function hideLeaderboard() {
+            document.getElementById('leaderboardModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function switchLeaderboardTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show selected content
+            document.getElementById('wpmLeaderboard').style.display = tab === 'wpm' ? 'block' : 'none';
+            document.getElementById('accuracyLeaderboard').style.display = tab === 'accuracy' ? 'block' : 'none';
+        }
+
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch('http://localhost:5000/api/typing/leaderboard');
+                const data = await response.json();
+
+                // Update WPM leaderboard
+                const wpmBody = document.getElementById('wpmLeaderboardBody');
+                wpmBody.innerHTML = data.wpm.map((user, index) => `
+                    <tr>
+                        <td class="rank-${index + 1}">#${index + 1}</td>
+                        <td>${user.username}</td>
+                        <td>${user.stats.highestWPM}</td>
+                        <td>${user.stats.bestAccuracy}%</td>
+                        <td>${user.stats.testsCompleted}</td>
+                    </tr>
+                `).join('');
+
+                // Update Accuracy leaderboard
+                const accuracyBody = document.getElementById('accuracyLeaderboardBody');
+                accuracyBody.innerHTML = data.accuracy.map((user, index) => `
+                    <tr>
+                        <td class="rank-${index + 1}">#${index + 1}</td>
+                        <td>${user.username}</td>
+                        <td>${user.stats.bestAccuracy}%</td>
+                        <td>${user.stats.highestWPM}</td>
+                        <td>${user.stats.testsCompleted}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('Error loading leaderboard:', err);
+                alert('Failed to load leaderboard. Please try again.');
+            }
+        }
+
+        // Close leaderboard when clicking outside
+        document.getElementById('overlay').addEventListener('click', () => {
+            hideLeaderboard();
+            if (document.getElementById('navDrawer').classList.contains('open')) {
+                toggleNav();
+            }
+        });
+    </script>
+</body>
+</html> 

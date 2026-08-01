@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Games - Typetest</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .games-body {
+            margin: 0;
+            padding: 0;
+            background: #f6f9fc;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .games-navbar {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #4a90e2;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .logo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #666;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-link:hover {
+            color: #4a90e2;
+        }
+
+        .games-dropdown {
+            position: relative;
+        }
+
+        .dropdown-btn {
+            background: none;
+            border: none;
+            color: #666;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .dropdown-btn:hover {
+            background: #f0f0f0;
+            color: #4a90e2;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s;
+            z-index: 1001;
+        }
+
+        .dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            display: block;
+            padding: 12px 16px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: #4a90e2;
+        }
+
+        .games-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px 40px 20px; /* Added top padding to account for fixed navbar */
+        }
+
+        .games-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .games-header h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .games-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .game-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .game-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .game-card p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .play-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .play-btn:hover {
+            background: #357abd;
+        }
+
+        .game-area {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+            min-height: 500px;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                gap: 15px;
+            }
+            
+            .games-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .games-container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body class="games-body">
+    <nav class="games-navbar">
+        <div class="navbar-content">
+            <a href="home.html" class="logo">
+                <img src="https://img.icons8.com/ios-filled/50/4a90e2/box.png" alt="Logo"/>
+                Typetest
+            </a>
+            <div class="nav-links">
+                <a href="home.html" class="nav-link">Home</a>
+                <div class="games-dropdown">
+                    <button class="dropdown-btn" onclick="toggleDropdown()">
+                        Games ▼
+                    </button>
+                    <div class="dropdown-menu" id="gamesDropdown">
+                        <a href="#" class="dropdown-item" onclick="showGame('reaction')">⚡ Reaction Speed</a>
+                        <a href="#" class="dropdown-item" onclick="showGame('coreball')">⚽ Coreball</a>
+                        <a href="#" class="dropdown-item" onclick="showGame('dino')">🦕 Dino Game</a>
+                        <a href="#" class="dropdown-item" onclick="showGame('circle')">⭕ Perfect Circle</a>
+                    </div>
+                </div>
+                <a href="#" class="nav-link" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="games-container">
+        <!-- Games Overview -->
+        <div id="gamesOverview">
+            <div class="games-header">
+                <h1>🎮 Game Center</h1>
+                <p>Challenge yourself with these fun mini-games!</p>
+            </div>
+
+            <div class="games-grid">
+                <div class="game-card" onclick="showGame('reaction')">
+                    <div class="game-icon">⚡</div>
+                    <h3>Reaction Speed Game</h3>
+                    <p>Test your reflexes! Click as fast as possible when the screen turns green.</p>
+                    <button class="play-btn">Play Now</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('coreball')">
+                    <div class="game-icon">⚽</div>
+                    <h3>Coreball Game</h3>
+                    <p>Attach balls to the spinning core without hitting other balls. 5 challenging levels!</p>
+                    <button class="play-btn">Play Now</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('dino')">
+                    <div class="game-icon">🦕</div>
+                    <h3>Dino Game</h3>
+                    <p>The classic Chrome offline game! Jump over cacti and avoid pterodactyls.</p>
+                    <button class="play-btn">Play Now</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('circle')">
+                    <div class="game-icon">⭕</div>
+                    <h3>Perfect Circle</h3>
+                    <p>Draw the most perfect circle you can with your mouse. Get scored on accuracy!</p>
+                    <button class="play-btn">Play Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Areas -->
+        <div id="reactionGame" class="game-area">
+            <button class="back-btn" onclick="showOverview()">← Back to Games</button>
+            <div id="reactionGameContent"></div>
+        </div>
+
+        <div id="coreballGame" class="game-area">
+            <button class="back-btn" onclick="showOverview()">← Back to Games</button>
+            <div id="coreballGameContent"></div>
+        </div>
+
+        <div id="dinoGame" class="game-area">
+            <button class="back-btn" onclick="showOverview()">← Back to Games</button>
+            <div id="dinoGameContent"></div>
+        </div>
+
+        <div id="circleGame" class="game-area">
+            <button class="back-btn" onclick="showOverview()">← Back to Games</button>
+            <div id="circleGameContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check authentication
+        function getToken() {
+            return sessionStorage.getItem('token') || localStorage.getItem('token');
+        }
+
+        if (!getToken()) {
+            window.location.href = 'index.html';
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('gamesDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('gamesDropdown');
+            const dropdownBtn = document.querySelector('.dropdown-btn');
+            
+            if (!dropdown.contains(event.target) && !dropdownBtn.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        function showOverview() {
+            document.getElementById('gamesOverview').style.display = 'block';
+            document.querySelectorAll('.game-area').forEach(area => {
+                area.classList.remove('active');
+            });
+        }
+
+        function showGame(gameType) {
+            document.getElementById('gamesOverview').style.display = 'none';
+            document.querySelectorAll('.game-area').forEach(area => {
+                area.classList.remove('active');
+            });
+
+            const gameArea = document.getElementById(gameType + 'Game');
+            gameArea.classList.add('active');
+
+            // Load the specific game
+            switch(gameType) {
+                case 'reaction':
+                    loadReactionGame();
+                    break;
+                case 'coreball':
+                    loadCoreballGame();
+                    break;
+                case 'dino':
+                    loadDinoGame();
+                    break;
+                case 'circle':
+                    loadCircleGame();
+                    break;
+            }
+
+            // Close dropdown
+            document.getElementById('gamesDropdown').classList.remove('show');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('username');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('username');
+            window.location.href = 'index.html';
+        }
+
+        // Game loading functions (to be implemented)
+        function loadReactionGame() {
+            document.getElementById('reactionGameContent').innerHTML = `
+                <div style="text-align: center;">
+                    <h2>⚡ Reaction Speed Test</h2>
+                    <p>Click as fast as possible when the screen turns <span style="color: green; font-weight: bold;">GREEN</span>!</p>
+                    
+                    <div id="reactionArea" style="
+                        width: 100%;
+                        height: 300px;
+                        background: #e9ecef;
+                        border-radius: 12px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 24px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        margin: 20px 0;
+                        transition: background-color 0.1s;
+                    " onclick="handleReactionClick()">
+                        Click "Start" to begin
+                    </div>
+                    
+                    <button id="reactionStartBtn" onclick="startReactionTest()" style="
+                        background: #4a90e2;
+                        color: white;
+                        border: none;
+                        padding: 15px 30px;
+                        border-radius: 8px;
+                        font-size: 18px;
+                        cursor: pointer;
+                        margin: 10px;
+                    ">Start Test</button>
+                    
+                    <button onclick="resetReactionTest()" style="
+                        background: #6c757d;
+                        color: white;
+                        border: none;
+                        padding: 15px 30px;
+                        border-radius: 8px;
+                        font-size: 18px;
+                        cursor: pointer;
+                        margin: 10px;
+                    ">Reset</button>
+                    
+                    <div id="reactionResults" style="margin-top: 20px; font-size: 18px;"></div>
+                    
+                    <div id="reactionHistory" style="margin-top: 20px;">
+                        <h3>Your Best Times:</h3>
+                        <div id="reactionTimes" style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Initialize reaction game variables
+            window.reactionGame = {
+                state: 'waiting', // waiting, ready, green, finished
+                startTime: 0,
+                timeout: null,
+                times: JSON.parse(localStorage.getItem('reactionTimes') || '[]')
+            };
+            
+            updateReactionHistory();
+        }
+
+        function startReactionTest() {
+            const area = document.getElementById('reactionArea');
+            const btn = document.getElementById('reactionStartBtn');
+            const results = document.getElementById('reactionResults');
+            
+            if (window.reactionGame.state !== 'waiting') return;
+            
+            window.reactionGame.state = 'ready';
+            btn.disabled = true;
+            results.innerHTML = '';
+            
+            area.style.background = '#dc3545';
+            area.style.color = 'white';
+            area.innerHTML = 'Wait for GREEN...';
+            
+            // Random delay between 2-6 seconds
+            const delay = Math.random() * 4000 + 2000;
+            
+            window.reactionGame.timeout = setTimeout(() => {
+                if (window.reactionGame.state === 'ready') {
+                    window.reactionGame.state = 'green';
+                    window.reactionGame.startTime = Date.now();
+                    area.style.background = '#28a745';
+                    area.innerHTML = 'CLICK NOW!';
+                }
+            }, delay);
+        }
+
+        function handleReactionClick() {
+            const area = document.getElementById('reactionArea');
+            const btn = document.getElementById('reactionStartBtn');
+            const results = document.getElementById('reactionResults');
+            
+            if (window.reactionGame.state === 'ready') {
+                // Clicked too early
+                clearTimeout(window.reactionGame.timeout);
+                window.reactionGame.state = 'waiting';
+                area.style.background = '#e9ecef';
+                area.style.color = 'black';
+                area.innerHTML = 'Too early! Click "Start" to try again';
+                btn.disabled = false;
+                results.innerHTML = '<span style="color: red;">❌ Too early! Wait for green.</span>';
+                
+            } else if (window.reactionGame.state === 'green') {
+                // Correct click
+                const reactionTime = Date.now() - window.reactionGame.startTime;
+                window.reactionGame.state = 'finished';
+                
+                area.style.background = '#17a2b8';
+                area.style.color = 'white';
+                area.innerHTML = `${reactionTime}ms`;
+                
+                // Save time
+                window.reactionGame.times.push(reactionTime);
+                window.reactionGame.times.sort((a, b) => a - b);
+                if (window.reactionGame.times.length > 10) {
+                    window.reactionGame.times = window.reactionGame.times.slice(0, 10);
+                }
+                localStorage.setItem('reactionTimes', JSON.stringify(window.reactionGame.times));
+                
+                // Show results
+                let message = `⚡ ${reactionTime}ms `;
+                if (reactionTime < 200) message += '🔥 Lightning fast!';
+                else if (reactionTime < 300) message += '⚡ Excellent!';
+                else if (reactionTime < 400) message += '👍 Good!';
+                else if (reactionTime < 500) message += '👌 Not bad!';
+                else message += '🐌 Keep practicing!';
+                
+                results.innerHTML = message;
+                updateReactionHistory();
+                
+                setTimeout(() => {
+                    resetReactionTest();
+                }, 2000);
+            }
+        }
+
+        function resetReactionTest() {
+            const area = document.getElementById('reactionArea');
+            const btn = document.getElementById('reactionStartBtn');
+            
+            clearTimeout(window.reactionGame.timeout);
+            window.reactionGame.state = 'waiting';
+            
+            area.style.background = '#e9ecef';
+            area.style.color = 'black';
+            area.innerHTML = 'Click "Start" to begin';
+            btn.disabled = false;
+        }
+
+        function updateReactionHistory() {
+            const container = document.getElementById('reactionTimes');
+            if (!container || !window.reactionGame) return;
+            
+            const times = window.reactionGame.times.slice(0, 5); // Show top 5
+            container.innerHTML = times.map((time, index) => 
+                `<div style="
+                    background: ${index === 0 ? '#ffd700' : '#f8f9fa'};
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    font-weight: bold;
+                    color: ${index === 0 ? '#333' : '#666'};
+                ">${index + 1}. ${time}ms</div>`
+            ).join('') || '<div style="color: #666;">No times recorded yet</div>';
+        }
+
+        function loadCoreballGame() {
+            document.getElementById('coreballGameContent').innerHTML = `
+                <div style="text-align: center;">
+                    <h2>⚽ Coreball Game</h2>
+                    <div id="coreballUI" style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div>Level: <span id="coreballLevel">1</span></div>
+                            <div>Balls Left: <span id="coreballBallsLeft">5</span></div>
+                            <div>Score: <span id="coreballScore">0</span></div>
+                        </div>
+                        <button id="coreballStartBtn" onclick="startCoreballGame()" style="
+                            background: #4a90e2;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            margin: 5px;
+                        ">Start Level</button>
+                        <button onclick="resetCoreballGame()" style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            margin: 5px;
+                        ">Reset Game</button>
+                    </div>
+                    
+                    <canvas id="coreballCanvas" width="500" height="500" style="
+                        border: 2px solid #333;
+                        border-radius: 8px;
+                        background: #1a1a1a;
+                        cursor: pointer;
+                    "></canvas>
+                    
+                    <div id="coreballInstructions" style="margin-top: 15px; color: #666;">
+                        <p>Click to attach balls to the spinning core. Don't hit other balls!</p>
+                        <p>Complete all 5 levels to win!</p>
+                    </div>
+                </div>
+            `;
+            
+            initializeCoreballGame();
+        }
+
+        function initializeCoreballGame() {
+            window.coreballGame = {
+                canvas: document.getElementById('coreballCanvas'),
+                ctx: null,
+                level: 1,
+                score: 0,
+                ballsLeft: 5,
+                isPlaying: false,
+                animationId: null,
+                core: { x: 250, y: 250, radius: 30, angle: 0, speed: 0.02 },
+                attachedBalls: [],
+                pendingBall: null,
+                gameWon: false
+            };
+            
+            const game = window.coreballGame;
+            game.ctx = game.canvas.getContext('2d');
+            
+            // Add click listener
+            game.canvas.addEventListener('click', handleCoreballClick);
+            
+            // Set initial level parameters
+            updateCoreballLevel();
+            drawCoreballGame();
+        }
+
+        function updateCoreballLevel() {
+            const game = window.coreballGame;
+            const levelConfig = {
+                1: { ballsToAttach: 5, coreSpeed: 0.02, attachedBalls: 0 },
+                2: { ballsToAttach: 6, coreSpeed: 0.025, attachedBalls: 2 },
+                3: { ballsToAttach: 7, coreSpeed: 0.03, attachedBalls: 4 },
+                4: { ballsToAttach: 8, coreSpeed: 0.035, attachedBalls: 6 },
+                5: { ballsToAttach: 10, coreSpeed: 0.04, attachedBalls: 8 }
+            };
+            
+            const config = levelConfig[game.level];
+            game.ballsLeft = config.ballsToAttach;
+            game.core.speed = config.coreSpeed;
+            
+            // Add pre-existing balls for higher levels
+            game.attachedBalls = [];
+            for (let i = 0; i < config.attachedBalls; i++) {
+                const angle = (Math.PI * 2 * i) / config.attachedBalls;
+                game.attachedBalls.push({
+                    angle: angle,
+                    distance: 60,
+                    radius: 8
+                });
+            }
+            
+            document.getElementById('coreballLevel').textContent = game.level;
+            document.getElementById('coreballBallsLeft').textContent = game.ballsLeft;
+            document.getElementById('coreballScore').textContent = game.score;
+        }
+
+        function startCoreballGame() {
+            const game = window.coreballGame;
+            if (game.isPlaying) return;
+            
+            game.isPlaying = true;
+            document.getElementById('coreballStartBtn').disabled = true;
+            
+            gameLoop();
+        }
+
+        function gameLoop() {
+            const game = window.coreballGame;
+            if (!game.isPlaying) return;
+            
+            // Update core rotation
+            game.core.angle += game.core.speed;
+            
+            // Update attached balls
+            game.attachedBalls.forEach(ball => {
+                ball.angle += game.core.speed;
+            });
+            
+            drawCoreballGame();
+            game.animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function drawCoreballGame() {
+            const game = window.coreballGame;
+            const ctx = game.ctx;
+            
+            // Clear canvas
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, 500, 500);
+            
+            // Draw core
+            ctx.fillStyle = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(game.core.x, game.core.y, game.core.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw attached balls
+            game.attachedBalls.forEach(ball => {
+                const x = game.core.x + Math.cos(ball.angle) * ball.distance;
+                const y = game.core.y + Math.sin(ball.angle) * ball.distance;
+                
+                // Draw line to core
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(game.core.x, game.core.y);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // Draw ball
+                ctx.fillStyle = '#4ecdc4';
+                ctx.beginPath();
+                ctx.arc(x, y, ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            // Draw pending ball
+            if (game.pendingBall) {
+                ctx.fillStyle = '#ffe66d';
+                ctx.beginPath();
+                ctx.arc(game.pendingBall.x, game.pendingBall.y, 8, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function handleCoreballClick(event) {
+            const game = window.coreballGame;
+            if (!game.isPlaying || game.ballsLeft <= 0) return;
+            
+            const rect = game.canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Calculate angle and distance from core
+            const dx = x - game.core.x;
+            const dy = y - game.core.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+            
+            // Check if click is in valid range
+            if (distance < game.core.radius + 20 || distance > 200) return;
+            
+            // Check collision with existing balls
+            let collision = false;
+            const newBallRadius = 8; // Radius of the new ball we're trying to place
+            
+            game.attachedBalls.forEach(ball => {
+                const ballX = game.core.x + Math.cos(ball.angle) * ball.distance;
+                const ballY = game.core.y + Math.sin(ball.angle) * ball.distance;
+                const dist = Math.sqrt((x - ballX) ** 2 + (y - ballY) ** 2);
+                
+                // Two circles collide if distance between centers < sum of their radii
+                // Adding small buffer (2px) to make collision detection more forgiving
+                const minDistance = ball.radius + newBallRadius + 2;
+                if (dist < minDistance) {
+                    collision = true;
+                }
+            });
+            
+            if (collision) {
+                // Game over - silently restart the level
+                game.isPlaying = false;
+                cancelAnimationFrame(game.animationId);
+                document.getElementById('coreballStartBtn').disabled = false;
+                return;
+            }
+            
+            // Add ball
+            game.attachedBalls.push({
+                angle: angle,
+                distance: distance,
+                radius: 8
+            });
+            
+            game.ballsLeft--;
+            game.score += 10;
+            
+            document.getElementById('coreballBallsLeft').textContent = game.ballsLeft;
+            document.getElementById('coreballScore').textContent = game.score;
+            
+            // Check level completion
+            if (game.ballsLeft <= 0) {
+                game.isPlaying = false;
+                cancelAnimationFrame(game.animationId);
+                
+                if (game.level < 5) {
+                    game.level++;
+                    setTimeout(() => {
+                        updateCoreballLevel();
+                        document.getElementById('coreballStartBtn').disabled = false;
+                    }, 500);
+                } else {
+                    game.gameWon = true;
+                }
+            }
+        }
+
+        function resetCoreballGame() {
+            const game = window.coreballGame;
+            if (game.animationId) {
+                cancelAnimationFrame(game.animationId);
+            }
+            
+            game.level = 1;
+            game.score = 0;
+            game.isPlaying = false;
+            game.gameWon = false;
+            
+            updateCoreballLevel();
+            document.getElementById('coreballStartBtn').disabled = false;
+            drawCoreballGame();
+        }
+
+        function loadDinoGame() {
+            document.getElementById('dinoGameContent').innerHTML = `
+                <div style="text-align: center;">
+                    <h2>🦕 Dino Game</h2>
+                    <div id="dinoUI" style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 15px;">
+                            <div>Score: <span id="dinoScore">0</span></div>
+                            <div>High Score: <span id="dinoHighScore">0</span></div>
+                        </div>
+                        <button id="dinoStartBtn" onclick="startDinoGame()" style="
+                            background: #4a90e2;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            margin: 5px;
+                        ">Start Game</button>
+                        <button onclick="resetDinoGame()" style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            margin: 5px;
+                        ">Reset</button>
+                    </div>
+                    
+                    <canvas id="dinoCanvas" width="800" height="200" style="
+                        border: 2px solid #333;
+                        border-radius: 8px;
+                        background: #f7f7f7;
+                        display: block;
+                        margin: 0 auto;
+                    "></canvas>
+                    
+                    <div id="dinoInstructions" style="margin-top: 15px; color: #666;">
+                        <p>Press SPACEBAR or click to jump over cacti!</p>
+                        <p>Avoid the obstacles and try to get a high score!</p>
+                    </div>
+                </div>
+            `;
+            
+            initializeDinoGame();
+        }
+
+        function initializeDinoGame() {
+            window.dinoGame = {
+                canvas: document.getElementById('dinoCanvas'),
+                ctx: null,
+                isPlaying: false,
+                animationId: null,
+                score: 0,
+                highScore: parseInt(localStorage.getItem('dinoHighScore') || '0'),
+                gameSpeed: 3,
+                
+                dino: {
+                    x: 50,
+                    y: 150,
+                    width: 40,
+                    height: 40,
+                    dy: 0,
+                    jumpPower: 15,
+                    grounded: true,
+                    color: '#4a90e2'
+                },
+                
+                obstacles: [],
+                clouds: [],
+                
+                gravity: 0.8,
+                groundY: 170
+            };
+            
+            const game = window.dinoGame;
+            game.ctx = game.canvas.getContext('2d');
+            
+            // Update high score display
+            document.getElementById('dinoHighScore').textContent = game.highScore;
+            
+            // Add event listeners
+            document.addEventListener('keydown', handleDinoKeyPress);
+            game.canvas.addEventListener('click', handleDinoJump);
+            
+            // Initialize clouds
+            for (let i = 0; i < 3; i++) {
+                game.clouds.push({
+                    x: Math.random() * 800,
+                    y: Math.random() * 50 + 20,
+                    width: 60,
+                    height: 20,
+                    speed: 0.5
+                });
+            }
+            
+            drawDinoGame();
+        }
+
+        function startDinoGame() {
+            const game = window.dinoGame;
+            if (game.isPlaying) return;
+            
+            game.isPlaying = true;
+            game.score = 0;
+            game.gameSpeed = 3;
+            game.obstacles = [];
+            game.dino.y = game.groundY - game.dino.height;
+            game.dino.dy = 0;
+            game.dino.grounded = true;
+            
+            document.getElementById('dinoStartBtn').disabled = true;
+            document.getElementById('dinoScore').textContent = '0';
+            
+            dinoGameLoop();
+        }
+
+        function dinoGameLoop() {
+            const game = window.dinoGame;
+            if (!game.isPlaying) return;
+            
+            // Update score and speed
+            game.score++;
+            if (game.score % 100 === 0) {
+                game.gameSpeed += 0.2;
+            }
+            
+            // Update dino physics
+            if (!game.dino.grounded) {
+                game.dino.dy += game.gravity;
+                game.dino.y += game.dino.dy;
+                
+                if (game.dino.y >= game.groundY - game.dino.height) {
+                    game.dino.y = game.groundY - game.dino.height;
+                    game.dino.dy = 0;
+                    game.dino.grounded = true;
+                }
+            }
+            
+            // Spawn obstacles
+            if (Math.random() < 0.005 + (game.score * 0.000001)) {
+                game.obstacles.push({
+                    x: 800,
+                    y: game.groundY - 30,
+                    width: 20,
+                    height: 30,
+                    color: '#2d5a27'
+                });
+            }
+            
+            // Update obstacles
+            game.obstacles = game.obstacles.filter(obstacle => {
+                obstacle.x -= game.gameSpeed;
+                return obstacle.x > -obstacle.width;
+            });
+            
+            // Update clouds
+            game.clouds.forEach(cloud => {
+                cloud.x -= cloud.speed;
+                if (cloud.x < -cloud.width) {
+                    cloud.x = 800;
+                    cloud.y = Math.random() * 50 + 20;
+                }
+            });
+            
+            // Check collisions
+            game.obstacles.forEach(obstacle => {
+                if (game.dino.x < obstacle.x + obstacle.width &&
+                    game.dino.x + game.dino.width > obstacle.x &&
+                    game.dino.y < obstacle.y + obstacle.height &&
+                    game.dino.y + game.dino.height > obstacle.y) {
+                    
+                    // Game over
+                    game.isPlaying = false;
+                    cancelAnimationFrame(game.animationId);
+                    
+                    if (game.score > game.highScore) {
+                        game.highScore = game.score;
+                        localStorage.setItem('dinoHighScore', game.highScore.toString());
+                        document.getElementById('dinoHighScore').textContent = game.highScore;
+                        alert(`New High Score: ${game.score}!`);
+                    } else {
+                        alert(`Game Over! Score: ${game.score}`);
+                    }
+                    
+                    document.getElementById('dinoStartBtn').disabled = false;
+                    return;
+                }
+            });
+            
+            document.getElementById('dinoScore').textContent = Math.floor(game.score / 10);
+            drawDinoGame();
+            game.animationId = requestAnimationFrame(dinoGameLoop);
+        }
+
+        function drawDinoGame() {
+            const game = window.dinoGame;
+            const ctx = game.ctx;
+            
+            // Clear canvas
+            ctx.fillStyle = '#f7f7f7';
+            ctx.fillRect(0, 0, 800, 200);
+            
+            // Draw clouds
+            ctx.fillStyle = '#ddd';
+            game.clouds.forEach(cloud => {
+                ctx.fillRect(cloud.x, cloud.y, cloud.width, cloud.height);
+                ctx.fillRect(cloud.x + 10, cloud.y - 5, cloud.width - 20, cloud.height + 10);
+            });
+            
+            // Draw ground
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, game.groundY, 800, 2);
+            
+            // Draw dino
+            ctx.fillStyle = game.dino.color;
+            ctx.fillRect(game.dino.x, game.dino.y, game.dino.width, game.dino.height);
+            
+            // Draw dino eye
+            ctx.fillStyle = 'white';
+            ctx.fillRect(game.dino.x + 25, game.dino.y + 8, 8, 8);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(game.dino.x + 27, game.dino.y + 10, 4, 4);
+            
+            // Draw obstacles (cacti)
+            ctx.fillStyle = '#2d5a27';
+            game.obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                // Add cactus details
+                ctx.fillRect(obstacle.x - 5, obstacle.y + 10, 10, 8);
+                ctx.fillRect(obstacle.x + obstacle.width - 5, obstacle.y + 15, 10, 8);
+            });
+            
+            // Draw game over message if not playing
+            if (!game.isPlaying && game.score > 0) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, 800, 200);
+                
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('GAME OVER', 400, 80);
+                ctx.font = '20px Arial';
+                ctx.fillText(`Score: ${Math.floor(game.score / 10)}`, 400, 110);
+                ctx.fillText('Click Start to play again', 400, 140);
+            }
+        }
+
+        function handleDinoKeyPress(event) {
+            if (event.code === 'Space') {
+                event.preventDefault();
+                handleDinoJump();
+            }
+        }
+
+        function handleDinoJump() {
+            const game = window.dinoGame;
+            if (game.isPlaying && game.dino.grounded) {
+                game.dino.dy = -game.dino.jumpPower;
+                game.dino.grounded = false;
+            }
+        }
+
+        function resetDinoGame() {
+            const game = window.dinoGame;
+            if (game.animationId) {
+                cancelAnimationFrame(game.animationId);
+            }
+            
+            game.isPlaying = false;
+            game.score = 0;
+            game.obstacles = [];
+            game.dino.y = game.groundY - game.dino.height;
+            game.dino.dy = 0;
+            game.dino.grounded = true;
+            
+            document.getElementById('dinoStartBtn').disabled = false;
+            document.getElementById('dinoScore').textContent = '0';
+            drawDinoGame();
+        }
+
+        function loadCircleGame() {
+            document.getElementById('circleGameContent').innerHTML = `
+                <div style="text-align: center;">
+                    <h2>⭕ Perfect Circle Challenge</h2>
+                    <div id="circleUI" style="margin-bottom: 20px;">
+                        <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 15px;">
+                            <div>Score: <span id="circleScore">-</span></div>
+                            <div>Best Score: <span id="circleBestScore">0%</span></div>
+                            <div>Attempts: <span id="circleAttempts">0</span></div>
+                        </div>
+                        <button onclick="startCircleGame()" style="
+                            background: #4a90e2;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            margin: 5px;
+                        ">New Circle</button>
+                        <button onclick="resetCircleGame()" style="
+                            background: #6c757d;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            margin: 5px;
+                        ">Reset Stats</button>
+                    </div>
+                    
+                    <canvas id="circleCanvas" width="500" height="500" style="
+                        border: 2px solid #333;
+                        border-radius: 8px;
+                        background: white;
+                        cursor: crosshair;
+                        display: block;
+                        margin: 0 auto;
+                    "></canvas>
+                    
+                    <div id="circleInstructions" style="margin-top: 15px; color: #666;">
+                        <p>Draw a perfect circle with your mouse!</p>
+                        <p>Click and drag to draw, release to finish and get scored.</p>
+                    </div>
+                    
+                    <div id="circleResult" style="margin-top: 15px; font-size: 18px; font-weight: bold;"></div>
+                </div>
+            `;
+            
+            initializeCircleGame();
+        }
+
+        function initializeCircleGame() {
+            window.circleGame = {
+                canvas: document.getElementById('circleCanvas'),
+                ctx: null,
+                isDrawing: false,
+                points: [],
+                attempts: parseInt(localStorage.getItem('circleAttempts') || '0'),
+                bestScore: parseFloat(localStorage.getItem('circleBestScore') || '0'),
+                currentScore: null
+            };
+            
+            const game = window.circleGame;
+            game.ctx = game.canvas.getContext('2d');
+            
+            // Update displays
+            document.getElementById('circleAttempts').textContent = game.attempts;
+            document.getElementById('circleBestScore').textContent = game.bestScore.toFixed(1) + '%';
+            
+            // Add event listeners
+            game.canvas.addEventListener('mousedown', startCircleDrawing);
+            game.canvas.addEventListener('mousemove', continueCircleDrawing);
+            game.canvas.addEventListener('mouseup', finishCircleDrawing);
+            game.canvas.addEventListener('mouseleave', finishCircleDrawing);
+            
+            // Touch events for mobile
+            game.canvas.addEventListener('touchstart', handleCircleTouch);
+            game.canvas.addEventListener('touchmove', handleCircleTouch);
+            game.canvas.addEventListener('touchend', finishCircleDrawing);
+            
+            clearCircleCanvas();
+        }
+
+        function startCircleGame() {
+            const game = window.circleGame;
+            game.points = [];
+            game.currentScore = null;
+            document.getElementById('circleScore').textContent = '-';
+            document.getElementById('circleResult').innerHTML = '';
+            clearCircleCanvas();
+        }
+
+        function clearCircleCanvas() {
+            const game = window.circleGame;
+            game.ctx.fillStyle = 'white';
+            game.ctx.fillRect(0, 0, 500, 500);
+            
+            // Draw guide circle (faint)
+            game.ctx.strokeStyle = '#f0f0f0';
+            game.ctx.lineWidth = 1;
+            game.ctx.setLineDash([5, 5]);
+            game.ctx.beginPath();
+            game.ctx.arc(250, 250, 150, 0, Math.PI * 2);
+            game.ctx.stroke();
+            game.ctx.setLineDash([]);
+            
+            // Draw center dot
+            game.ctx.fillStyle = '#ddd';
+            game.ctx.beginPath();
+            game.ctx.arc(250, 250, 3, 0, Math.PI * 2);
+            game.ctx.fill();
+        }
+
+        function getCircleMousePos(event) {
+            const game = window.circleGame;
+            const rect = game.canvas.getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
+
+        function startCircleDrawing(event) {
+            const game = window.circleGame;
+            game.isDrawing = true;
+            game.points = [];
+            
+            const pos = getCircleMousePos(event);
+            game.points.push(pos);
+            
+            clearCircleCanvas();
+        }
+
+        function continueCircleDrawing(event) {
+            const game = window.circleGame;
+            if (!game.isDrawing) return;
+            
+            const pos = getCircleMousePos(event);
+            game.points.push(pos);
+            
+            // Draw the line
+            if (game.points.length > 1) {
+                const ctx = game.ctx;
+                ctx.strokeStyle = '#4a90e2';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                ctx.beginPath();
+                ctx.moveTo(game.points[game.points.length - 2].x, game.points[game.points.length - 2].y);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+            }
+        }
+
+        function finishCircleDrawing() {
+            const game = window.circleGame;
+            if (!game.isDrawing || game.points.length < 10) {
+                game.isDrawing = false;
+                return;
+            }
+            
+            game.isDrawing = false;
+            game.attempts++;
+            localStorage.setItem('circleAttempts', game.attempts.toString());
+            document.getElementById('circleAttempts').textContent = game.attempts;
+            
+            // Calculate circle score
+            const score = calculateCircleScore(game.points);
+            game.currentScore = score;
+            
+            // Update best score
+            if (score > game.bestScore) {
+                game.bestScore = score;
+                localStorage.setItem('circleBestScore', game.bestScore.toString());
+                document.getElementById('circleBestScore').textContent = game.bestScore.toFixed(1) + '%';
+            }
+            
+            document.getElementById('circleScore').textContent = score.toFixed(1) + '%';
+            
+            // Show result message
+            let message = '';
+            let color = '';
+            if (score >= 95) {
+                message = '🎯 Perfect! You\'re a circle master!';
+                color = '#28a745';
+            } else if (score >= 90) {
+                message = '🔥 Excellent! Almost perfect!';
+                color = '#28a745';
+            } else if (score >= 80) {
+                message = '👍 Great job! Very circular!';
+                color = '#4a90e2';
+            } else if (score >= 70) {
+                message = '👌 Good attempt! Keep practicing!';
+                color = '#ffc107';
+            } else if (score >= 50) {
+                message = '🤔 Not bad, but needs work!';
+                color = '#fd7e14';
+            } else {
+                message = '😅 That\'s... creative! Try again!';
+                color = '#dc3545';
+            }
+            
+            document.getElementById('circleResult').innerHTML = 
+                `<span style="color: ${color};">${message}</span>`;
+            
+            // Draw the ideal circle for comparison
+            setTimeout(() => {
+                drawIdealCircle(game.points);
+            }, 1000);
+        }
+
+        function calculateCircleScore(points) {
+            if (points.length < 10) return 0;
+            
+            // Find center of drawn shape
+            let centerX = 0, centerY = 0;
+            points.forEach(p => {
+                centerX += p.x;
+                centerY += p.y;
+            });
+            centerX /= points.length;
+            centerY /= points.length;
+            
+            // Calculate average radius
+            let avgRadius = 0;
+            points.forEach(p => {
+                const dist = Math.sqrt((p.x - centerX) ** 2 + (p.y - centerY) ** 2);
+                avgRadius += dist;
+            });
+            avgRadius /= points.length;
+            
+            // Calculate how much each point deviates from the average radius
+            let totalDeviation = 0;
+            points.forEach(p => {
+                const dist = Math.sqrt((p.x - centerX) ** 2 + (p.y - centerY) ** 2);
+                totalDeviation += Math.abs(dist - avgRadius);
+            });
+            
+            // Calculate score (lower deviation = higher score)
+            const avgDeviation = totalDeviation / points.length;
+            const maxDeviation = avgRadius; // Worst case scenario
+            const score = Math.max(0, (1 - (avgDeviation / maxDeviation)) * 100);
+            
+            return score;
+        }
+
+        function drawIdealCircle(points) {
+            const game = window.circleGame;
+            
+            // Calculate center and average radius
+            let centerX = 0, centerY = 0;
+            points.forEach(p => {
+                centerX += p.x;
+                centerY += p.y;
+            });
+            centerX /= points.length;
+            centerY /= points.length;
+            
+            let avgRadius = 0;
+            points.forEach(p => {
+                const dist = Math.sqrt((p.x - centerX) ** 2 + (p.y - centerY) ** 2);
+                avgRadius += dist;
+            });
+            avgRadius /= points.length;
+            
+            // Draw ideal circle
+            game.ctx.strokeStyle = '#28a745';
+            game.ctx.lineWidth = 2;
+            game.ctx.setLineDash([10, 5]);
+            game.ctx.beginPath();
+            game.ctx.arc(centerX, centerY, avgRadius, 0, Math.PI * 2);
+            game.ctx.stroke();
+            game.ctx.setLineDash([]);
+            
+            // Draw center point
+            game.ctx.fillStyle = '#28a745';
+            game.ctx.beginPath();
+            game.ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+            game.ctx.fill();
+        }
+
+        function handleCircleTouch(event) {
+            event.preventDefault();
+            const touch = event.touches[0];
+            if (!touch) return;
+            
+            const mouseEvent = new MouseEvent(event.type === 'touchstart' ? 'mousedown' : 'mousemove', {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            
+            if (event.type === 'touchstart') {
+                startCircleDrawing(mouseEvent);
+            } else if (event.type === 'touchmove') {
+                continueCircleDrawing(mouseEvent);
+            }
+        }
+
+        function resetCircleGame() {
+            const game = window.circleGame;
+            game.attempts = 0;
+            game.bestScore = 0;
+            game.currentScore = null;
+            
+            localStorage.removeItem('circleAttempts');
+            localStorage.removeItem('circleBestScore');
+            
+            document.getElementById('circleAttempts').textContent = '0';
+            document.getElementById('circleBestScore').textContent = '0%';
+            document.getElementById('circleScore').textContent = '-';
+            document.getElementById('circleResult').innerHTML = '';
+            
+            clearCircleCanvas();
+        }
+    </script>
+</body>
+</html>
